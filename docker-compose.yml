@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+  # The application
+  harun-app:
+    build: .
+    ports:
+      - 3000:3000
+    volumes:
+      - ./src:/opt/app/src
+    environment:
+      - envName=staging
+      - DATABASE=postgres://postgres:secret@harun-postgres:5432/harun
+    depends_on:
+      - harun-postgres
+  # Database server
+  harun-postgres:
+    image: postgres:10-alpine
+    environment:
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=harun
+    logging:
+      driver: none

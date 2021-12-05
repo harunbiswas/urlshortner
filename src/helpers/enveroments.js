@@ -19,6 +19,7 @@ const enviroments = {};
 enviroments.staging = {
     port: 3000,
     envName: 'staging',
+    secretKey: 'djflkhjfrghlkjrfg98459045jsklfgjldasjf'
     
 };
 
@@ -27,6 +28,7 @@ enviroments.staging = {
 enviroments.production = {
     port: 5000,
     envName: 'production',
+    secretKey: 'fjadsjfjjjr0f09sdf0uj4j35ruu5jfgklvj9a'
     
 }
 

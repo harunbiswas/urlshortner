@@ -9,7 +9,7 @@
 const http = require('http');
 
 const enviroments = require('./enveroments')
-const handleReqRes = require('./handelReqRes')
+const {handleReqRes} = require('./handelReqRes')
 
 
 // module scaffolding
@@ -19,7 +19,7 @@ const server = {}
 // body
 server.init= () => {
     server.serverCreate = () => {
-        const server = http.createServer(handleReqRes.reqRes)
+        const server = http.createServer(handleReqRes)
 
         server.listen(enviroments.port, () => {
             console.log(`listening to port ${enviroments.port || 4000}`)
