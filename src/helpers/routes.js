@@ -9,6 +9,7 @@
 const {sampleHandler} = require('../handler/sampleHandler');
 const {singupHandler} = require('../handler/singupHandler');
 const {loginHandler} = require('../handler/loginHandler');
+const {redirestsHandler} = require('../handler/redirestsHandler');
 
 
 // module scaffolding
@@ -20,6 +21,7 @@ const routes = {
     sample: sampleHandler,
     singup: singupHandler,
     login: loginHandler,
+    record: redirestsHandler,
 }
 
 

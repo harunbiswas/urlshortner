@@ -64,7 +64,9 @@ handler.handleReqRes = (req, res) => {
     
             const payloadString = JSON.stringify(payload);
     
-            res.setHeader('Content-Type', 'application/json')
+            res.setHeader('Content-Type', 'application/json');
+            res.setHeader('Access-Control-Allow-Origin', '*');
+            res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
             res.writeHead(statusCode);
             res.end(payloadString);
         });
