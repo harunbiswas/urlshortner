@@ -8,10 +8,12 @@
 // dependenciess
 const url = require('url');
 const {StringDecoder} = require('string_decoder');
+const {urlHandler} = require('../handler/urlHandler')
 const routes = require('./routes');
 const {notFundHandler} = require('../handler/notFundHandler');
 const { homeHandler } = require('../handler/homeHandler');
 const {parseJSON} = require('../utils/password')
+
 
 
 // module scaffolding
@@ -28,7 +30,6 @@ handler.handleReqRes = (req, res) => {
     const method = req.method.toLowerCase();
     const queryStringObject = parsedUrl.query;
     const headersObject = req.headers;
-
     const requestProperties = {
         parsedUrl,
         path,
@@ -38,12 +39,17 @@ handler.handleReqRes = (req, res) => {
         headersObject,
     }
 
+
     const decoder = new StringDecoder('utf-8');
     let realData = '';
     
     let chosenHandler = homeHandler;
+    let redirecthandler = urlHandler;
+
     if(trimmedPath === ''){
-        chosenHandler = homeHandler;
+        redirecthandler = homeHandler;
+    }else if(trimmedPath.charAt(0) === ':'){
+        chosenHandler = urlHandler;
     }else{
         chosenHandler = routes[trimmedPath] ? routes[trimmedPath] : notFundHandler;
     }
@@ -58,7 +64,10 @@ handler.handleReqRes = (req, res) => {
         realData += decoder.end();
         requestProperties.body = parseJSON(realData)
 
-        chosenHandler (requestProperties, (statusCode, payload) => {
+        if(!(trimmedPath.charAt(0) === ':')){
+
+        
+        chosenHandler(requestProperties, (statusCode, payload) => {
             statusCode = typeof statusCode === 'number' ? statusCode : 500;
             payload = typeof payload === 'object' ? payload : {};
     
@@ -70,6 +79,19 @@ handler.handleReqRes = (req, res) => {
             res.writeHead(statusCode);
             res.end(payloadString);
         });
+    }else {
+
+        redirecthandler (requestProperties, (statusCode, destination) => {
+            destination = typeof destination === 'string' ? destination : "https://hbrubel.com";
+            statusCode = typeof statusCode === 'number' ? statusCode : 500;
+            
+            res.writeHead(statusCode, {
+                'Location': destination
+                //add other headers here...
+              });
+              res.end();
+        })
+    }
     });
 
     

@@ -7,7 +7,7 @@
 
 // dependenciess
 
-const { read, update } = require('../controllers/data');
+const { read, update, create } = require('../controllers/data');
 const data = require('../controllers/data')
 const {generate, validate, parseJSON} = require('../utils/password');
 const loginHandler = require('./loginHandler')
@@ -50,31 +50,45 @@ handler._redirests.post = (requestProparties, callback) => {
                             //look up the user
                             read('users', userEmail, (err1, data1) =>{
                                 if(!err1 && data1){
+                                    const baseUrs = 'http://localhost:3000/';
                                     const userData = parseJSON(data1);
                                     const id = userData._id;
                                     const destination = url;
                                     const timestamp = Date.now()/1000;
                                     const hash = parseInt(`${timestamp}`).toString(32);
+                                    const shortUrl = `${baseUrs}:${hash}`;
                                     const hashObject = {
                                         destination,
                                         hash,
+                                        shortUrl
                                     }
-                                    if(!userData.record){
-                                        userData.record = [];
-                                    }
-                                    userData.record.push(hashObject)
-                                    console.log(userData.record)
-                                    update('users', userEmail, userData, (err2) => {
-                                        if(!err2){
-                                            callback(200, {
-                                                message: 'record store successfully!'
+                                    const newHash = ":"+ hash
+                                    create('record', hash, hashObject, (err3) => {
+                                        if(!err3){
+                                            if(!userData.record){
+                                                userData.record = [];
+                                            }
+                                            userData.record.push(hashObject);
+                                            update('users', userEmail, userData, (err2) => {
+                                                if(!err2){
+                                                    callback(200, {
+                                                        message: 'record store successfully!'
+                                                    })
+                                                }else {
+                                                    callback(500, {
+                                                        error: 'redord not store'
+                                                    })
+                                                }
                                             })
                                         }else {
                                             callback(500, {
-                                                error: 'redord not store'
+                                                error: "hash not store!"
                                             })
                                         }
                                     })
+
+
+                                    
                                 }else {
                                     callback(500, {
                                         error: 'user not found!'
@@ -112,7 +126,7 @@ handler._redirests.get = (requestProparties, callback) => {
     const email = typeof(requestProparties.queryStringObject.email) === 'string' && /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(requestProparties.queryStringObject.email) ? requestProparties.queryStringObject.email : false;
 
     const token = typeof(requestProparties.headersObject.token) === 'string' ? requestProparties.headersObject.token : false
-    console.log(token)
+    
     if(email && token){
         loginHandler._token.verify(token, email, (validate) => {
             if(validate) {
